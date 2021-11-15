@@ -1,5 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
+
+STUDENT_NR_MAURITS = 14014777
+STUDENT_NR_HARSHITA = 13807609
+
+SEED = STUDENT_NR_MAURITS + STUDENT_NR_HARSHITA
+
+
 def mandelbrot_matrix(N=200, re_lim=(-2,1),im_lim=(-1,1), height=400, width=600):
     """Optimized implementation of mandelbrot set using array multiplications instead of for loops.
 
@@ -36,11 +43,11 @@ def mandelbrot_matrix(N=200, re_lim=(-2,1),im_lim=(-1,1), height=400, width=600)
 
     return [n, re, im]
 
-def random_mandelbrot_points(n_size, re_lim, im_lim, threshold=100):
+def random_mandelbrot_points(n_samples, re_lim, im_lim, threshold=100):
     """Generates array of uniformly distributed complex numbers and calculates the mandelbrot set for these numbers
 
         Args:
-            n_size (int): size of the array of complex number
+            n_samples (int): number of samples taken. Each sample is an complex number
             re_lim (tuple): lower and upperlimit of the real axis
             im_lim (tuple): lower and upperlimit(real numbers) of the imaginary axis.
             threshold (int, optional): threshold used to calculate the mandelbrot set. Defaults to 100.
@@ -48,13 +55,14 @@ def random_mandelbrot_points(n_size, re_lim, im_lim, threshold=100):
         Returns:
             list: [0]array of real numbers, [1]Array of imaginary numbers, [2]array of n values from the mandelbrot set.
     """
-    re = np.random.uniform(re_lim[0], re_lim[1], size=n_size) # type: ignore
-    im = np.random.uniform(im_lim[0], im_lim[1], size=n_size) # type: ignore
+    # np.random.seed(SEED) #type: ignore
+    re = np.random.uniform(re_lim[0], re_lim[1], size=n_samples) # type: ignore
+    im = np.random.uniform(im_lim[0], im_lim[1], size=n_samples) # type: ignore
 
     random_points = re+im*1j
     # create the counter matrix "n" and the z matrix
-    n = np.zeros(n_size)
-    z = np.zeros(n_size)
+    n = np.zeros(n_samples)
+    z = np.zeros(n_samples)
 
     MAX_ITER = threshold
     # iterate until the threshold is reached
