@@ -43,11 +43,11 @@ def mandelbrot_matrix(N=200, re_lim=(-2,1),im_lim=(-1,1), height=400, width=600)
 
     return [n, re, im]
 
-def random_mandelbrot_points(n_samples, re_lim, im_lim, threshold=100):
+def random_mandelbrot_points(n_points, re_lim, im_lim, threshold=100):
     """Generates array of uniformly distributed complex numbers and calculates the mandelbrot set for these numbers
 
         Args:
-            n_samples (int): number of samples taken. Each sample is an complex number
+            n_points (int): number of points taken. Each sample is an complex number
             re_lim (tuple): lower and upperlimit of the real axis
             im_lim (tuple): lower and upperlimit(real numbers) of the imaginary axis.
             threshold (int, optional): threshold used to calculate the mandelbrot set. Defaults to 100.
@@ -56,13 +56,13 @@ def random_mandelbrot_points(n_samples, re_lim, im_lim, threshold=100):
             list: [0]array of real numbers, [1]Array of imaginary numbers, [2]array of n values from the mandelbrot set.
     """
     # np.random.seed(SEED) #type: ignore
-    re = np.random.uniform(re_lim[0], re_lim[1], size=n_samples) # type: ignore
-    im = np.random.uniform(im_lim[0], im_lim[1], size=n_samples) # type: ignore
+    re = np.random.uniform(re_lim[0], re_lim[1], size=n_points) # type: ignore
+    im = np.random.uniform(im_lim[0], im_lim[1], size=n_points) # type: ignore
 
     random_points = re+im*1j
     # create the counter matrix "n" and the z matrix
-    n = np.zeros(n_samples)
-    z = np.zeros(n_samples)
+    n = np.zeros(n_points)
+    z = np.zeros(n_points)
 
     MAX_ITER = threshold
     # iterate until the threshold is reached
