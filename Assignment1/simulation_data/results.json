@@ -1,0 +1,4 @@
+[
+    {"generate_pureRandomSample": {"mean": 1.509964375, "std": 0.02471202224342182, "n(trails)": 2400.0, "comp time": 849.4326226711273}},
+    {"generate_latinHyperCube": {"mean": 1.5080381818181818, "std": 0.016352631046677488, "n(trails)": 1100.0, "comp time": 455.0267241001129}}
+]
