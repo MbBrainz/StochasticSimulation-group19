@@ -1,7 +1,24 @@
 from sampling_functions import generate_pureRandomSample
 from mandelbrot_matrix import random_mandelbrot_points
 import numpy as np
+from tqdm.auto import trange, tqdm
 from time import time
+
+
+import csv
+
+def save_to_csv(filedir: str, datalists, headers=[],  mode="w"):
+    with open("simulation_data/" + filedir, mode=mode, newline="") as fp:
+        writer = csv.writer(fp)
+        if not len(headers)==0:
+            writer.writerow(headers)
+
+        for i in range(len(datalists[0])):
+            row = []
+            for i_list in range(len(datalists)):
+                row.append(datalists[i_list][i])
+            writer.writerow(row)
+        print("saved to file!")
 
 
 class TestResult:
@@ -26,16 +43,25 @@ class TestResult:
          str(self.funct): {
             "mean": self.mean,
             "std": self.std,
+            "confidence_nt": self.confidence_int,
             "n(trails)": self.trails,
-            "comp time": self.sim_time
+            "comp_time": self.sim_time
         }}
 
     def explain(self):
         """Prints the results to console in a readable format
         """
-        print(f"Interval reached after {self.trails} in {self.sim_time:.0g} seconds. mean={self.mean:.4f}, std={self.std:.4g}")
-        print(f"This means for a {(1-self.alpha)*100}% confidence interval, we have a={self.confidence_int:.3g} and X={self.mean:.5f}\n \
-                ")
+        print(f"Result of simulation for {self.funct}: \n \
+                n_sims \t| \t {self.trails} \n    \
+                mean \t| \t {self.mean:.4f} \n    \
+                std \t| \t {self.std:.4g} \n    \
+                comp. time\t| \t {self.sim_time:.0f} s \n    \
+                conf. int.\t| \t {self.confidence_int:.3g} \n    \
+                conf % \t| \t {(1-self.alpha)*100} \n    \
+              ")
+        # print(f"Interval reached after {self.trails} in {self.sim_time:.0g} seconds. mean={self.mean:.4f}, std={self.std:.4g}")
+        # print(f"This means for a {(1-self.alpha)*100}% confidence interval, we have a={self.confidence_int:.3g} and X={self.mean:.5f}\n \
+        #         ")
 
 def test_sampling_function(sampling_function, samplestep, max_a,threshold, n_points):
     """Tests the given sampling function by running *samplestep simulations and checking that with the max_a value.
@@ -76,6 +102,23 @@ def test_sampling_function(sampling_function, samplestep, max_a,threshold, n_poi
 
     return result
 
+def compare_sampling_functions(sampling_function, n_simulations, threshold, n_points):
+
+        print(f"Running simulation for {sampling_function.__name__}:")
+        mean, std, sim_time, run_data = run_simulation(sample_size=n_simulations,n_points=n_points,threshold=threshold, function=sampling_function)
+        total_time = sim_time*n_simulations
+        a = get_confidence_interval(1.96, std, n_simulations)
+
+        result = TestResult(sample_mean=mean,
+                      sample_std=std,
+                      trails=n_simulations,
+                      sim_time=total_time,
+                      confidence_int=a,
+                      alpha=0.05,
+                      funct=sampling_function.__name__)
+        return result, run_data
+
+
 def get_confidence_interval(lmda, sample_std, sample_size):
     """calculates confidence interval for a given lamda and sample
 
@@ -105,10 +148,11 @@ def run_simulation(sample_size, n_points, threshold=100, re_lim=(-2,1), im_lim=(
     Returns:
         [type]: [description]
     """
+
     sample_data = []
     sample_time = []
     plot_area = (re_lim[1] - re_lim[0]) * (im_lim[1]-im_lim[0])
-    for sample in range(sample_size):
+    for sample in tqdm(range(sample_size)):
         start_time = time()
         # run iteration
         re, im, n = random_mandelbrot_points(n_points, re_lim=re_lim, im_lim=im_lim, threshold=threshold, function=function)

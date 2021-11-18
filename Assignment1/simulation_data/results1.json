@@ -1,0 +1,5 @@
+[
+    {"generate_pureRandomSample": {"mean": 1.5472083333333333, "std": 0.2522005960044504, "n(trails)": 2500.0, "comp time": 4.7116858959198}},
+    {"generate_latinHyperCube": {"mean": 1.543315972222222, "std": 0.17136918328183864, "n(trails)": 1200.0, "comp time": 3.395163059234619}},
+    {"generate_Orthogonal": {"mean": 1.5466145833333331, "std": 0.09822887670070315, "n(trails)": 400.0, "comp time": 1.4126412868499756}}
+]
