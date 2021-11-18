@@ -1,1 +1,29 @@
-[[
+[
+    {
+        "generate_pureRandomSample": {
+            "mean": 1.5053645833333333,
+            "std": 0.24999778102313838,
+            "confidence_nt": 0.015495023001214284,
+            "n(trails)": 1000,
+            "comp_time": 20.986600160598755
+        }
+    },
+    {
+        "generate_latinHyperCube": {
+            "mean": 1.5032291666666668,
+            "std": 0.17301512633574043,
+            "confidence_nt": 0.010723588630101347,
+            "n(trails)": 1000,
+            "comp_time": 19.354811906814575
+        }
+    },
+    {
+        "generate_Orthogonal": {
+            "mean": 1.5103125,
+            "std": 0.09925935575481594,
+            "confidence_nt": 0.006152158608016738,
+            "n(trails)": 1000,
+            "comp_time": 23.27567172050476
+        }
+    }
+]

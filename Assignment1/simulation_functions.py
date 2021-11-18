@@ -100,7 +100,7 @@ def test_sampling_function(sampling_function, samplestep, max_a,threshold, n_poi
                       alpha=0.05,
                       funct=sampling_function.__name__)
 
-    return result
+    return result, data
 
 def compare_sampling_functions(sampling_function, n_simulations, threshold, n_points):
 
