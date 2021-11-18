@@ -88,6 +88,7 @@ generate_latinHyperCube(9)
 
 # %%
 def generate_Orthogonal(n,re_lim=[-2,1], im_lim=[-1.25,1.25]):
+    n = int(np.round(np.sqrt(n)))
 
     width_x = re_lim[1]-re_lim[0]
     width_y = im_lim[1]-im_lim[0]
@@ -104,16 +105,16 @@ def generate_Orthogonal(n,re_lim=[-2,1], im_lim=[-1.25,1.25]):
         ylist[i] = np.random.permutation(ylist[i])
     for i in range(n):
         for j in range(n):
-            x = -2.0 + x_scale*(xlist[i][j] + np.random.uniform())
-            y = -1.0 + y_scale*(ylist[j][i] + np.random.uniform())
+            x = re_lim[0] + x_scale*(xlist[i][j] + np.random.uniform())
+            y = im_lim[0] + y_scale*(ylist[j][i] + np.random.uniform())
             re.append(x)
             im.append(y)
 
 
     # plot_latin(re,im)
     # plt.show()
-    #print(re)
-    #print(im
+    # print(re)
+    # print(im)
 
     re_all = np.array(re)
     im_all = np.array(im)
@@ -141,8 +142,8 @@ def generate_Orthogonal_inPlace(n,re_lim=[-2,1], im_lim=[-1.25,1.25]):
         ylist[i] = np.random.permutation(ylist[i])
     for i in range(n):
         for j in range(n):
-            x = -2.0 + x_scale*(xlist[i][j] + np.random.uniform())
-            y = -1.0 + y_scale*(ylist[j][i] + np.random.uniform())
+            x = re_lim[0] + x_scale*(xlist[i][j] + np.random.uniform())
+            y = im_lim[0] + y_scale*(ylist[j][i] + np.random.uniform())
             re.append(x)
             im.append(y)
 
