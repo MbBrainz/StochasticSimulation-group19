@@ -1,1 +1,26 @@
-{"generate_pureRandomSample": {"mean": 1.5114800347222221, "std": 0.24882173052202583, "n(trails)": 2400.0, "comp time": 38.30694007873535}}{"generate_latinHyperCube": {"mean": 1.5087594696969695, "std": 0.16892911576756597, "n(trails)": 1100.0, "comp time": 18.797027587890625}}{"generate_Orthogonal": {"mean": 1.510546875, "std": 0.10008261764571164, "n(trails)": 400.0, "comp time": 8.1497323513031}}
+[
+    {
+        "generate_pureRandomSample": {
+            "mean": 1.5114800347222221,
+            "std": 0.24882173052202583,
+            "n(trails)": 2400.0,
+            "comp time": 38.30694007873535
+        }
+    },
+    {
+        "generate_latinHyperCube": {
+            "mean": 1.5087594696969695,
+            "std": 0.16892911576756597,
+            "n(trails)": 1100.0,
+            "comp time": 18.797027587890625
+        }
+    },
+    {
+        "generate_Orthogonal": {
+            "mean": 1.510546875,
+            "std": 0.10008261764571164,
+            "n(trails)": 400.0,
+            "comp time": 8.1497323513031
+        }
+    }
+]
