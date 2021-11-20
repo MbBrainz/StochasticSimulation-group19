@@ -62,6 +62,7 @@ def random_mandelbrot_points(n_points, re_lim, im_lim, threshold=100, function=g
     im = np.random.uniform(im_lim[0], im_lim[1], size=n_points) # type: ignore
 
     random_points = function(n_points, re_lim=re_lim, im_lim=im_lim)
+    n_points = len(random_points)
     # create the counter matrix "n" and the z matrix
     n = np.zeros(n_points)
     z = np.zeros(n_points)

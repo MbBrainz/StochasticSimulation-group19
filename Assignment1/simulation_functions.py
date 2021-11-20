@@ -156,6 +156,7 @@ def run_simulation(sample_size, n_points, threshold=100, re_lim=(-2,1), im_lim=(
         start_time = time()
         # run iteration
         re, im, n = random_mandelbrot_points(n_points, re_lim=re_lim, im_lim=im_lim, threshold=threshold, function=function)
+        n_points = len(n)
 
         # calculate sample data
         points_inside = np.size(np.where(n>=threshold))

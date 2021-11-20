@@ -132,15 +132,15 @@ def generate_sobol(n, re_lim=[-2,1], im_lim=[-1.25,1.25]):
     u_bounds = [re_lim[1], im_lim[1]]
 
     num_samples = int(np.round(np.log2(n)))
-    print(num_samples)
+    # print(num_samples)
 
     re_im_samples = re_im_sampler.random_base2(num_samples)
     # 2**num_samples are generated ~ n
     re_im_samples = qmc.scale(re_im_samples, l_bounds, u_bounds)
-    plt.scatter(re_im_samples[:,0],re_im_samples[:,1])
-    plt.show()
-    plot_latin(re_im_samples[:,0],re_im_samples[:,1])
-    plt.show()
+    # plt.scatter(re_im_samples[:,0],re_im_samples[:,1])
+    # plt.show()
+    # plot_latin(re_im_samples[:,0],re_im_samples[:,1])
+    # plt.show()
     re_im_samples = re_im_samples[:,0] + re_im_samples[:,1]*1j
     re_im_samples = re_im_samples[:n]
 
