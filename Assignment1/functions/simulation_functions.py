@@ -78,15 +78,15 @@ def run_simulation(sample_size, n_points, n_iterations=100, re_lim=(-2,1), im_li
     """Create a sample collection of size *sample_size by calculating the mandelbrot area for each iteration
 
     Args:
-        sample_size ([type]): [description]
-        n_points ([type]): [description]
-        threshold (int, optional): [description]. Defaults to 100.
-        re_lim (tuple, optional): [description]. Defaults to (-2,1).
-        im_lim (tuple, optional): [description]. Defaults to (-1.25,1.25).
-        function ([type], optional): [description]. Defaults to generate_pureRandomSample.
+        sample_size (INT): amount of simulations to run
+        n_points ): number of generated sample points for the mandelbrot set computation
+        n_iterations (int, optional): number of iterations that is used as threshold to determine which points lay inside the mandelbrot set. Defaults to 100.
+        re_lim (tuple, optional): upper and lower limit of the real axis. Defaults to (-2,1).
+        im_lim (tuple, optional): upper and lower limit of the imaginary axis. Defaults to (-1.25,1.25).
+        function ([type], optional): Sampling function that returns the amount of random sapleas that are used as input for the calculation od the M set. Defaults to generate_pureRandomSample.
 
     Returns:
-        [type]: [description]
+        tuple: mean_area, standard deviation area, calculation time per iteration, sapmle data used
     """
 
     sample_data = []
@@ -115,18 +115,21 @@ def run_simulation(sample_size, n_points, n_iterations=100, re_lim=(-2,1), im_li
 
 def test_sampling_function_max_a(sampling_function, samplestep, max_a, n_iterations, n_points):
     """Tests the given sampling function by running *samplestep simulations and checking that with the max_a value.
-    If the confidence interval of the sample data is larger than *max_a then runs another *samplestep iterations.
-    If a is within max_a, then finish and return the result in a convenient format.
+        If the confidence interval of the sample data is larger than *max_a then runs another *samplestep iterations.
+        If a is within max_a, then finish and return the result in a convenient format.
 
-    Args:
-        sampling_function ([type]): [description]
-        samplestep ([type]): [description]
-        max_a ([type]): [description]
-        threshold ([type]): [description]
-        n_points ([type]): [description]
+        Args:
+            samplestep (int): amount of simulations to run before the threshold of max_a is tested
+            n_points (int): number of generated sample points for the mandelbrot set computation
+            max_a (float): max confidence interval used to compute if the simulations stops or continues
+            n_iterations (int, optional): number of iterations that is used as threshold to determine which points lay inside the mandelbrot set. Defaults to 100.
+            re_lim (tuple, optional): upper and lower limit of the real axis. Defaults to (-2,1).
+            im_lim (tuple, optional): upper and lower limit of the imaginary axis. Defaults to (-1.25,1.25).
+            function ([type], optional): Sampling function that returns the amount of random sapleas that are used as input for the calculation od the M set. Defaults to generate_pureRandomSample.
 
-    Returns:
-        [type]: [description]
+
+        Returns:
+            [type]: [description]
     """
     a = 1
     mean, it_count, total_time, std = 0.0 ,0.0 ,0.0 ,0.0
@@ -153,32 +156,42 @@ def test_sampling_function_max_a(sampling_function, samplestep, max_a, n_iterati
     return result, data
 
 def test_sampling_function_nsims(sampling_function, n_simulations, n_iterations, n_points):
+    """Test the given sampling function for *n_simulations and returns a summerised result
 
+        Args:
+            sampling_function (function): A sampling function that returns an array with the samples in the form of a complex number
+            n_simulations (int): amount of simulations to average the results over
+            n_iterations (int): amount if iterations as threshold for the computation of the mandelbrot set
+            n_points (int): Amount of samples to generate and calculate the mandelbrot set for
 
-        print(f"Running simulation for {sampling_function.__name__}:")
-        mean, std, sim_time, run_data = run_simulation(sample_size=n_simulations,n_points=n_points,n_iterations=n_iterations, function=sampling_function)
-        total_time = sim_time*n_simulations
-        a = get_confidence_interval(1.96, std, n_simulations)
+        Returns:
+            tuple: [0] the resulting statistics of the simulations in a convenient class format Result. [1] Data generated from simulation to optionally add to previously collected data
+    """
 
-        result = TestResult(sample_mean=mean,
-                      sample_std=std,
-                      trails=n_simulations,
-                      sim_time=total_time,
-                      confidence_int=a,
-                      alpha=0.05,
-                      funct=sampling_function.__name__)
-        return result, run_data
+    print(f"Running simulation for {sampling_function.__name__}:")
+    mean, std, sim_time, run_data = run_simulation(sample_size=n_simulations,n_points=n_points,n_iterations=n_iterations, function=sampling_function)
+    total_time = sim_time*n_simulations
+    a = get_confidence_interval(1.96, std, n_simulations)
+
+    result = TestResult(sample_mean=mean,
+                    sample_std=std,
+                    trails=n_simulations,
+                    sim_time=total_time,
+                    confidence_int=a,
+                    alpha=0.05,
+                    funct=sampling_function.__name__)
+    return result, run_data
 
 def get_confidence_interval(lmda, sample_std, sample_size):
-    """calculates confidence interval for a given lamda and sample
+    """ calculates confidence interval for a given lamda and sample
 
     Args:
-        lmda ([type]): [description]
-        sample_std ([type]): [description]
-        sample_size ([type]): [description]
+        lmda ([type]): fractile of confidence letter
+        sample_std ([type]): sample standard deviation
+        sample_size ([type]): int
 
     Returns:
-        [type]: [description]
+        float: Confidence interval of the provided data. Lambda, sample_std, ample size
     """
 
     a = lmda * sample_std / np.sqrt(sample_size)

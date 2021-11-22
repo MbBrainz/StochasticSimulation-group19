@@ -27,6 +27,17 @@ def plot_random_points_distribution(re_list, im_list, re_lim=[-2,1], im_lim=[-1.
 
 # %%
 def generate_pureRandomSample(n,re_lim=[-2,1], im_lim=[-1.25,1.25], show_plot=False):
+    """generates a set of n random complex points with a uniform distribution
+
+        Args:
+            n (int): number of points generated
+            re_lim (list, optional): limit wrt the real domain of the generated numbers. Defaults to [-2,1].
+            im_lim (list, optional): limit wrt the imaginary domain of the generated point. Defaults to [-1.25,1.25].
+            show_plot (bool, optional): Variable that lets you plot the distribution of the points on a grid. Defaults to False.
+
+        Returns:
+            numpy.ndarray: array with the random points. every point is given as (a + bj)
+    """
 
     re = np.random.uniform(re_lim[0], re_lim[1], size=n)
     im = np.random.uniform(im_lim[0], im_lim[1], size=n)
@@ -39,6 +50,18 @@ def generate_pureRandomSample(n,re_lim=[-2,1], im_lim=[-1.25,1.25], show_plot=Fa
 
 # %%
 def generate_latinHyperCube(n,re_lim=[-2,1], im_lim=[-1.25,1.25], show_plot=False):
+    """generates a set of n random complex points with a distribution based on Latin Hyper Cube sampling.
+        See https://en.wikipedia.org/wiki/Latin_hypercube_sampling
+
+        Args:
+            n (int): number of points generated
+            re_lim (list, optional): limit wrt the real domain of the generated numbers. Defaults to [-2,1].
+            im_lim (list, optional): limit wrt the imaginary domain of the generated point. Defaults to [-1.25,1.25].
+            show_plot (bool, optional): Variable that lets you plot the distribution of the points on a grid. Defaults to False.
+
+        Returns:
+            numpy.ndarray: array with the random points. every point is given as (a + bj)
+    """
 
     width_re = re_lim[1] - re_lim[0]
     width_im = im_lim[1] - im_lim[0]
@@ -87,6 +110,19 @@ def generate_latinHyperCube(n,re_lim=[-2,1], im_lim=[-1.25,1.25], show_plot=Fals
 
 # %%
 def generate_Orthogonal(n,re_lim=[-2,1], im_lim=[-1.25,1.25], show_plot=False):
+    """generates a set of n random complex points with distribution based on orthogonal sampling. See
+        See https://en.wikipedia.org/wiki/Latin_hypercube_sampling
+
+        Args:
+            n (int): number of points generated
+            re_lim (list, optional): limit wrt the real domain of the generated numbers. Defaults to [-2,1].
+            im_lim (list, optional): limit wrt the imaginary domain of the generated point. Defaults to [-1.25,1.25].
+            show_plot (bool, optional): Variable that lets you plot the distribution of the points on a grid. Defaults to False.
+
+        Returns:
+            numpy.ndarray: array with the random points. every point is given as (a + bj)
+    """
+
     n = int(np.round(np.sqrt(n)))
 
     width_x = re_lim[1]-re_lim[0]
@@ -117,6 +153,18 @@ def generate_Orthogonal(n,re_lim=[-2,1], im_lim=[-1.25,1.25], show_plot=False):
 
 # %%
 def generate_sobol(n, re_lim=[-2,1], im_lim=[-1.25,1.25], show_plot=False):
+    """generates a set of n random complex points with distribution based on Sobol sampling. See
+        See https://en.wikipedia.org/wiki/Sobol_sequence
+
+        Args:
+            n (int): number of points generated
+            re_lim (list, optional): limit wrt the real domain of the generated numbers. Defaults to [-2,1].
+            im_lim (list, optional): limit wrt the imaginary domain of the generated point. Defaults to [-1.25,1.25].
+            show_plot (bool, optional): Variable that lets you plot the distribution of the points on a grid. Defaults to False.
+
+        Returns:
+            numpy.ndarray: array with the random points. every point is given as (a + bj)
+    """
 
     re_im_sampler = qmc.Sobol(d = 2)
     l_bounds = [re_lim[0], im_lim[0]]
@@ -135,20 +183,4 @@ def generate_sobol(n, re_lim=[-2,1], im_lim=[-1.25,1.25], show_plot=False):
     re_im_samples = re_im_samples[:,0] + re_im_samples[:,1]*1j
     re_im_samples = re_im_samples[:n]
 
-    return re_im_samples
-
-# %%
-def generate_halton(n, re_lim=[-2,1], im_lim=[-1.25,1.25], show_plot=False):
-
-    l_bounds = [re_lim[0], im_lim[0]]
-    u_bounds = [re_lim[1], im_lim[1]]
-
-    re_im_sampler = qmc.Halton(d = 2)
-
-    re_im_samples = re_im_sampler.random(n)
-    re_im_samples = qmc.scale(re_im_samples, l_bounds, u_bounds)
-
-    if show_plot: plot_random_points_distribution(re_im_samples[:,0],re_im_samples[:,1])
-
-    re_im_samples = re_im_samples[:,0] + re_im_samples[:,1]*1j
     return re_im_samples
