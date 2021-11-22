@@ -11,8 +11,12 @@ The assignments made by group 19 of the course Stochastic Simulation 2021 will b
 python package requirements:
 scipy v1.7.0 (v1.7.1 recommended)
 
-### TODOs Maupi:
-- replot distribution plot of random sampling
-- run simulation for SOBOL with fixed N
-- run simulation for SOBOL with fixed threshold
--
+### TODOs Maupi: Clean repo
+- renamed mandelbrot_random_points() to ompute_mandelbrot_set()
+- adjust output of compute_mandelbrot_set()
+- reordered input of compute_mandelbrot_set()
+- moved compare_mandelbrot_set() to simulation_functions.py
+- renamed test_sampling_function() to test_sampling_function_max_a()
+- renamed compare_sampling_functions() to test_sampling_function_nsims()
+- moved SEED to util.py
+- added show_plot=False variable to all sampling functions

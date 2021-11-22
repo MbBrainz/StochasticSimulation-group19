@@ -1,5 +1,10 @@
 import csv
 
+STUDENT_NR_MAURITS = 14014777
+STUDENT_NR_HARSHITA = 13807609
+
+SEED = STUDENT_NR_MAURITS + STUDENT_NR_HARSHITA
+
 def save_to_csv(filedir: str, datalists, headers=[],  mode="w"):
     with open("simulation_data/" + filedir, mode=mode, newline="") as fp:
         writer = csv.writer(fp)
