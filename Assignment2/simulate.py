@@ -36,3 +36,11 @@ n_jobs = 2000
 mu = 0.95
 rho_list = [0.8, 0.85, 0.90, 0.95]
 FIFOdatalist = []
+
+for load in rho_list:
+    FIFOdatalist.append(run_simulation(load,mu, n_servers=1, n_jobs=n_jobs,n_sims=n_sims,debug=1, iteration_function=run_iteration, return_data=True))
+
+#%%
+SJFdatalist = []
+for load in rho_list:
+    SJFdatalist.append(run_simulation(load, mu, n_servers=1, n_jobs=n_jobs, n_sims=n_sims, debug=1, iteration_function=run_prio_iteration,return_data=True))

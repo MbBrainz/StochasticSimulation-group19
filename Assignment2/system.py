@@ -51,6 +51,7 @@ class PrioSystem(object):
         self.server = PriorityResource(env,capacity=n_servers,)
         self.wait_times = []
         self.debug = debug
+        self.service_dist = "M"
 
     def priority_job(self, id):
         arrive = self.env.now
@@ -73,7 +74,18 @@ class PrioSystem(object):
         return prio, exp_rand
 
     def get_job_time(self):
-        return np.random.exponential(scale=1/self.mu)
+        if self.service_dist == "M":
+            return np.random.exponential(scale=1/self.mu)
+
+        if self.service_dist == "D":
+            return self.mu
+
+        if self.service_dist == "H":
+            mu = random.choices([self.mu ,5], weights=[0.75,0.25], k=1)
+            return np.random.exponential(scale=1/mu[0])
+        # TODO: Test functionality
+        # TODO: Implement prio cue
+
 
     def job_source(self, lmd, n_jobs):
         if self.debug >= 3: print(f'Job source starts with {n_jobs} prioJobs and lambda: {lmd}')
