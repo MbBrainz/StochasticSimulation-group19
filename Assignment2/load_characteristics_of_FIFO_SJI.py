@@ -1,4 +1,4 @@
-# run simulations for different loads
+#%%  run simulations for different loads
 # compare load statistics
 import numpy as np
 from simulation_functions import run_simulation, run_prio_iteration, run_iteration
@@ -9,8 +9,8 @@ import matplotlib.pyplot as plt
 #
 
 #%%
-n_sims = 50
-n_jobs = 2000
+n_sims = 20
+n_jobs = 400
 mu = 0.95
 rho_list = np.arange(0.8, 1.0, 0.02)
 FIFOdatalist = []

@@ -1,17 +1,15 @@
 import numpy as np
 from numpy.core.fromnumeric import mean
 from util import confidence_interval
-from system import System, PrioSystem, job_source, job
+from system import System, PrioSystem
 import simpy
 
 # pyright: reportPrivateImportUsage=false
 
 #%%
 def run_iteration(lmd, mu, n_servers, n_jobs, debug=0):
-    system = System(simpy.Environment(), n_servers, mu)
-    system.env.process(job_source(system, lmd, n_jobs, debug))
-    system.env.run()
-    mean_i = np.mean(system.wait_times)
+    system = System(simpy.Environment(), n_servers, mu, debug=debug)
+    mean_i = system.run(lmd,n_jobs)
     if debug == 2: print(f'Mean waiting time: {mean_i}')
     return system, mean_i
 
@@ -24,7 +22,6 @@ def run_prio_iteration(lmd, mu, n_servers, n_jobs, debug=0):
 def run_simulation(rho, mu, n_servers, n_jobs, n_sims ,debug=0, iteration_function=run_iteration, return_data=False):
     mean_list = []
     lmd = mu / (rho * n_servers)
-
 
     for i in range(n_sims):
         system, mean_i = iteration_function(lmd, mu, n_servers, n_jobs, debug)

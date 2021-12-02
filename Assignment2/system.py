@@ -32,16 +32,46 @@ from util import confidence_interval
 
 
 class System(object):
-    def __init__(self, env: simpy.Environment, n_servers, mu) -> None:
+    def __init__(self, env: simpy.Environment, n_servers, mu, debug=0) -> None:
         self.env = env
         self.mu = mu
         self.server = simpy.Resource(env,capacity=n_servers)
         self.wait_times = []
+        self.debug = debug
+        self.service_dist = "M"
 
+    def job(self, id):
+        arrive = self.env.now
+        if self.debug == 3: print(f'[{arrive}] Job{id} arrives')
+        with self.server.request() as req:
+            yield req
+            yield self.env.timeout(self.get_job_time())
+        wait = self.env.now - arrive
+        if self.debug == 3: print(f'job finished with id {id} after {wait:.2f}')
+        self.wait_times.append(wait)
 
+    def job_source(self, lmd, n_jobs):
+        if self.debug > 2: print(f"Job source setup with {n_jobs} jobs with arrival Rate = {lmd} ")
+        if self.debug > 2: print(f"Job source setup with {n_jobs} jobs with arrival Rate = {lmd} ")
+        for i in range(n_jobs):
+            inter_arrival = self.get_arrival_time(lmd)
+            yield self.env.timeout(inter_arrival)
 
+            self.env.process(self.job(i))
+
+    def run(self, lmd, n_jobs):
+        self.env.process(self.job_source(lmd,n_jobs))
+        self.env.run()
+        mean_i = np.mean(self.wait_times)
+        return mean_i
+
+    # random job arrival rate and service time getters
     def get_job_time(self):
         return np.random.exponential(scale=1/self.mu)
+
+    def get_arrival_time(self, lmd):
+        return np.random.exponential(scale=1/lmd)
+
 
 class PrioSystem(object):
     def __init__(self, env: simpy.Environment, n_servers, mu, debug) -> None:
@@ -67,6 +97,26 @@ class PrioSystem(object):
         if self.debug >= 3: print(f'job finished with id {id} after {wait:.2f}')
         self.wait_times.append(wait)
 
+    def job_source(self, lmd, n_jobs):
+        if self.debug >= 3: print(f'Job source starts with {n_jobs} prioJobs and lambda: {lmd}')
+        for i in range(n_jobs):
+
+            inter_arrival = self.get_arrival_time(lmd)
+            yield self.env.timeout(inter_arrival)
+
+            self.env.process(self.priority_job(i))
+
+    def run(self, lmd, n_jobs):
+        self.env.process(self.job_source(lmd,n_jobs))
+        self.env.run()
+        mean_i = np.mean(self.wait_times)
+        return mean_i
+
+    # random job arrival rate and service time getters
+    def get_arrival_time(self, lmd):
+        inter_arrival = np.random.exponential(scale=1/lmd)
+        return inter_arrival
+
     def get_prio_for_rnddistr(self):
         rand = random.uniform(0,1)
         prio = np.round(100*rand)
@@ -87,37 +137,6 @@ class PrioSystem(object):
         # TODO: Implement prio cue
 
 
-    def job_source(self, lmd, n_jobs):
-        if self.debug >= 3: print(f'Job source starts with {n_jobs} prioJobs and lambda: {lmd}')
-        for i in range(n_jobs):
-            inter_arrival = np.random.exponential(scale=1/lmd)
-            yield self.env.timeout(inter_arrival)
 
-            self.env.process(self.priority_job(i))
-
-    def run(self, lmd, n_jobs):
-        self.env.process(self.job_source(lmd,n_jobs))
-        self.env.run()
-        mean_i = np.mean(self.wait_times)
-        return mean_i
-
-def job_source(system:System, lmd, n_jobs, debug=0):
-    if debug > 2: print(f"Job source setup with {n_jobs} jobs with arrival Rate = {lmd} ")
-    if debug > 2: print(f"Job source setup with {n_jobs} jobs with arrival Rate = {lmd} ")
-    for i in range(n_jobs):
-        inter_arrival = np.random.exponential(scale=1/lmd)
-        yield system.env.timeout(inter_arrival)
-
-        system.env.process(job(system, i,debug=debug))
-
-def job(system:System, id, debug=0):
-    arrive = system.env.now
-    if debug == 3: print(f'[{arrive}] Job{id} arrives')
-    with system.server.request() as req:
-        yield req
-        yield system.env.timeout(system.get_job_time())
-    wait = system.env.now - arrive
-    if debug == 3: print(f'job finished with id {id} after {wait:.2f}')
-    system.wait_times.append(wait)
 
 # %%
