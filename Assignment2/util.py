@@ -3,6 +3,12 @@ import numpy as np
 from scipy import stats
 import json
 import matplotlib.pyplot as plt
+plt.style.use("seaborn")
+
+STUDENT_NR_MAURITS = 14014777
+STUDENT_NR_HARSHITA = 13807609
+
+SEED = STUDENT_NR_MAURITS + STUDENT_NR_HARSHITA
 
 def confidence_interval(mean_value, std_value, N, level):
     ci = stats.norm.interval( # type: ignore
@@ -48,7 +54,13 @@ def plot_errorbar(x_array, datalist, label, ax):
         capthick=2
     )
 
-
+def plot_sim_data(ax, data, label):
+    ax.plot(
+        data,
+        label=label,
+        linestyle='-',
+        marker='.'
+    )
 # Result format
 # data_dict = {
 #     "parameters": {
@@ -64,3 +76,4 @@ def plot_errorbar(x_array, datalist, label, ax):
 #         "SJF": SJFdatalist
 #     }
 # }
+# %%

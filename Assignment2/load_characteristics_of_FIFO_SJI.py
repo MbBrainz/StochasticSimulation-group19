@@ -1,27 +1,33 @@
 #%%  run simulations for different loads
 # compare load statistics
 import numpy as np
-from simulation_functions import run_simulation, run_prio_iteration, run_iteration
+from simulation_functions import run_simulation, SJF_iteration, FIFO_iteration
 import matplotlib.pyplot as plt
+from util import SEED
 
 #%% [markdown]
 # ## Check the behaviour of FIFO and SJF
 #
 
+
+
+# TODO: np.random.seed(SEED)
+
+
 #%%
-n_sims = 20
-n_jobs = 400
+n_sims = 200
+n_jobs = 20000
 mu = 0.95
 rho_list = np.arange(0.8, 1.0, 0.02)
 FIFOdatalist = []
 
 for load in rho_list:
-    FIFOdatalist.append(run_simulation(load,mu, n_servers=1, n_jobs=n_jobs,n_sims=n_sims,debug=1, iteration_function=run_iteration))
+    FIFOdatalist.append(run_simulation(load,mu, n_servers=1, n_jobs=n_jobs,n_sims=n_sims,debug=1, iteration_function=FIFO_iteration))
 
 #%%
 SJFdatalist = []
 for load in rho_list:
-    SJFdatalist.append(run_simulation(load, mu, n_servers=1, n_jobs=n_jobs, n_sims=n_sims, debug=1, iteration_function=run_prio_iteration))
+    SJFdatalist.append(run_simulation(load, mu, n_servers=1, n_jobs=n_jobs, n_sims=n_sims, debug=1, iteration_function=SJF_iteration))
 
 #%%
 from util import save_data
@@ -40,7 +46,7 @@ data_dict = {
     }
 }
 
-# save_data(data_dict, f"load_chr_FIFO_SJF_errorbar_drho=0.02_mu=095_njobs=2000-2")
+save_data(data_dict, f"load_chr_FIFO_SJF_errorbar_drho=0.02_mu=095_njobs=20000-2")
 # %%
 plt.style.use('seaborn')
 from util import plot_errorHue
@@ -55,9 +61,8 @@ ax.set(
     title='load characeristics of service systems',
     xticks=rho_list
 )
-
+# plt.savefig("figures/load_chr_FIFO_SJF_errorHue_drho=0.02_mu=095_njobs=20000-1.png")
 #%%
-
 
 
 from util import plot_errorbar
@@ -71,21 +76,22 @@ ax.set(
     title='load characeristics of service systems',
     xticks=rho_list
 )
+# plt.savefig("figures/load_chr_FIFO_SJF_errorbar_drho=0.02_mu=095_njobs=20000-1.png")
 
 #%% Plot distributions of watining times  for 4 values of rho
-n_sims = 200
-n_jobs = 2000
+n_sims = 100
+n_jobs = 20000
 mu = 0.95
-rho_list = [0.8, 0.85, 0.90, 0.95]
+rho_list = [0.8, 0.85, 0.90]
 FIFOdatalist = []
 
 for load in rho_list:
-    FIFOdatalist.append(run_simulation(load,mu, n_servers=1, n_jobs=n_jobs,n_sims=n_sims,debug=1, iteration_function=run_iteration, return_data=True))
+    FIFOdatalist.append(run_simulation(load,mu, n_servers=1, n_jobs=n_jobs,n_sims=n_sims,debug=1, iteration_function=FIFO_iteration, return_data=True))
 
 #%%
 SJFdatalist = []
 for load in rho_list:
-    SJFdatalist.append(run_simulation(load, mu, n_servers=1, n_jobs=n_jobs, n_sims=n_sims, debug=1, iteration_function=run_prio_iteration,return_data=True))
+    SJFdatalist.append(run_simulation(load, mu, n_servers=1, n_jobs=n_jobs, n_sims=n_sims, debug=1, iteration_function=SJF_iteration,return_data=True))
 
 #%%
 import seaborn as sns
@@ -111,14 +117,20 @@ for i in range(len(rho_list)):
             str(rho_list[i])))
 
 df = pd.DataFrame(meandata_list, columns=["time", "service", "rho"],)
+df.to_csv("data/load_chr_FIFO_SJF_dataframe.csv")
 
 df.head()
 #%%
-sns.displot(df,bins=50,x="time", hue="service",col="rho",kde=True, legend=True)
-# plt.savefig("figures/load_chr_FIFO_SJF_kde_4rhos_mu=0.95_njobs=2000_nsim=200.png", dpi=600)
+sns.displot(df,bins=200,x="time", hue="service",col="rho",kde=True, legend=True)
+plt.ylim(top=200)
+plt.xlim(right=40)
+plt.savefig("figures/load_chr_FIFO_SJF_kde_4rhos_mu=0.95_njobs=20000_nsim=200.png", dpi=600)
 
-sns.violinplot(data=df,x="rho",y="time",hue="service",legend=True)
-# plt.savefig("figures/load_chr_FIFO_SJF_violin_4rhos_mu=0.95_njobs=2000_nsim=200-1.png", dpi=600)
+#%%
+# isRho09or08 = df['rho']== ( 0.9 | 0.8 )
+# df_filtered=df[df['rho'].isin([0.8, 0.85, 0.9])]
+sns.violinplot(data= df,x="rho",y="time",hue="service",legend=True)
+plt.savefig("figures/load_chr_FIFO_SJF_violin_4rhos_mu=0.95_njobs=20000_nsim=200-1.png", dpi=600)
 
 
 #%% Saving general stats to json
@@ -152,5 +164,5 @@ stats_dict = {
 }
 print(stats_dict)
 #%%
-from util import save_data
-# save_data(stats_dict, "load_chr_FIFO_SJF_general_stats")
+# from util import save_data
+save_data(stats_dict, "load_chr_FIFO_SJF_general_stats-1")
