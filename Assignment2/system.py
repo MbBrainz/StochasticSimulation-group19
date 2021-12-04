@@ -32,26 +32,33 @@ from util import confidence_interval
 
 
 class System(object):
-    def __init__(self, env: simpy.Environment, n_servers, mu, debug=0) -> None:
+    def __init__(self, env: simpy.Environment, n_servers, mu, service_dist="M", debug=0) -> None:
         self.env = env
         self.mu = mu
         self.server = simpy.Resource(env,capacity=n_servers)
         self.wait_times = []
+        self.in_system_times = []
         self.debug = debug
-        self.service_dist = "M"
+        self.service_dist = service_dist
 
     def job(self, id):
-        arrive = self.env.now
-        if self.debug == 3: print(f'[{arrive}] Job{id} arrives')
+        arrival_time = self.env.now
+        if self.debug == 3: print(f'[{arrival_time}] Job{id} arrives with quelength {len(self.server.queue)}')
+
         with self.server.request() as req:
             yield req
-            yield self.env.timeout(self.get_job_time())
-        wait = self.env.now - arrive
+
+            wait = self.env.now - arrival_time
+            self.wait_times.append(wait)
+
+            yield self.env.timeout(self.get_service_time())
+
+        in_system_time = self.env.now - arrival_time
+        self.in_system_times.append(in_system_time)
+
         if self.debug == 3: print(f'job finished with id {id} after {wait:.2f}')
-        self.wait_times.append(wait)
 
     def job_source(self, lmd, n_jobs):
-        if self.debug > 2: print(f"Job source setup with {n_jobs} jobs with arrival Rate = {lmd} ")
         if self.debug > 2: print(f"Job source setup with {n_jobs} jobs with arrival Rate = {lmd} ")
         for i in range(n_jobs):
             inter_arrival = self.get_arrival_time(lmd)
@@ -62,19 +69,35 @@ class System(object):
     def run(self, lmd, n_jobs):
         self.env.process(self.job_source(lmd,n_jobs))
         self.env.run()
-        mean_i = np.mean(self.wait_times)
+        mean_i = np.mean(self.in_system_times)
         return mean_i
 
     # random job arrival rate and service time getters
-    def get_job_time(self):
-        return np.random.exponential(scale=1/self.mu)
+    def get_service_time(self):
+
+        if self.service_dist == "M":
+            return np.random.exponential(scale=1/self.mu)
+
+        elif self.service_dist == "D":
+            return 1/self.mu
+
+        elif self.service_dist == "H":
+            c=0.2; p1=0.7; p2=1-p1
+            mu1 = self.mu*(1+c) / (1+c-p2) * p1
+            mu2 = self.mu*(1-c) / (1-c-p1) * p2
+            mu = random.choices([mu1,mu2], weights=[p1,p2], k=1)
+            return np.random.exponential(scale=1/mu[0])
+
+        else:
+            raise ValueError
+        # return np.random.exponential(scale=1/self.mu)
 
     def get_arrival_time(self, lmd):
         return np.random.exponential(scale=1/lmd)
 
 
 class PrioSystem(object):
-    def __init__(self, env: simpy.Environment, n_servers, mu, debug) -> None:
+    def __init__(self, env: simpy.Environment, n_servers, mu, debug=0) -> None:
         store = PriorityStore(env)
         self.env = env
         self.mu = mu
@@ -123,6 +146,7 @@ class PrioSystem(object):
         exp_rand = (-1 / self.mu) * np.log(1-rand)
         return prio, exp_rand
 
+    # not used ATM. made for service distr. Not applocable yet to Prio Job
     def get_job_time(self):
         if self.service_dist == "M":
             return np.random.exponential(scale=1/self.mu)
@@ -137,6 +161,6 @@ class PrioSystem(object):
         # TODO: Implement prio cue
 
 
-
+# %%
 
 # %%
