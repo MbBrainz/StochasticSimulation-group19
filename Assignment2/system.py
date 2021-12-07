@@ -82,9 +82,9 @@ class System(object):
             return 1/self.mu
 
         elif self.service_dist == "H":
-            c=0.2; p1=0.7; p2=1-p1
-            mu1 = self.mu*(1+c) / (1+c-p2) * p1
-            mu2 = self.mu*(1-c) / (1-c-p1) * p2
+            c=0.2; p1=0.75; p2=1-p1
+            mu1 = self.mu*(1-c) / (1-c-p2) * p1
+            mu2 = self.mu*(1+c) / (1+c-p1) * p2
             mu = random.choices([mu1,mu2], weights=[p1,p2], k=1)
             return np.random.exponential(scale=1/mu[0])
 
@@ -109,12 +109,12 @@ class PrioSystem(object):
     def priority_job(self, id):
         arrive = self.env.now
 
-        priority = self.get_prio_for_rnddistr()
-        if self.debug >= 3: print(f'[{arrive}] Job{id} arrives with prio {priority[0]} and waiting time {priority[1]}')
+        service_time = self.get_service_time()
+        if self.debug >= 3: print(f'[{arrive}] Job{id} arrives with prio')
 
-        with self.server.request(priority=priority[0], preempt=True) as req:
+        with self.server.request(priority=int(service_time*1000000), preempt=True) as req:
             yield req
-            yield self.env.timeout(priority[1])
+            yield self.env.timeout(service_time)
 
         wait = self.env.now - arrive
         if self.debug >= 3: print(f'job finished with id {id} after {wait:.2f}')
@@ -147,18 +147,23 @@ class PrioSystem(object):
         return prio, exp_rand
 
     # not used ATM. made for service distr. Not applocable yet to Prio Job
-    def get_job_time(self):
+    def get_service_time(self):
         if self.service_dist == "M":
             return np.random.exponential(scale=1/self.mu)
 
-        if self.service_dist == "D":
-            return self.mu
+        elif self.service_dist == "D":
+            return 1/self.mu
 
-        if self.service_dist == "H":
-            mu = random.choices([self.mu ,5], weights=[0.75,0.25], k=1)
+        elif self.service_dist == "H":
+            c=0.2; p1=0.75; p2=1-p1
+            mu1 = self.mu*(1-c) / (1-c-p2) * p1
+            mu2 = self.mu*(1+c) / (1+c-p1) * p2
+            mu = random.choices([mu1,mu2], weights=[p1,p2], k=1)
             return np.random.exponential(scale=1/mu[0])
-        # TODO: Test functionality
-        # TODO: Implement prio cue
+
+        else:
+            raise ValueError
+        # return np.random.exponential(scale=1/self.mu)
 
 
 # %%

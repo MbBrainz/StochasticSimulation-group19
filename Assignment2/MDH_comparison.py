@@ -14,7 +14,9 @@ from simulation_functions import *
 rho=1
 mu=0.95
 n_servers=1
+n_sims = 200
 n_jobs = 3000
+mu = 0.95
 
 service_dist = ["Markov", "Deterministic", "Hyper Exponential"]
 colors=['red','blue','green']
@@ -23,7 +25,7 @@ colors=['red','blue','green']
 np.random.seed(SEED)
 wait_times = []
 for service in service_dist:
-    system, data = FIFO_iteration(rho=rho, mu=mu, n_servers=1, n_jobs=n_jobs,service_dist=service_dist[0], debug=2)
+    system, data = FIFO_iteration(rho=rho, mu=mu, n_servers=1, n_jobs=n_jobs,service_dist=service[0], debug=2)
     wait_times.append(system.wait_times)
 
 #%%
@@ -52,11 +54,10 @@ plt.savefig("MDH_iter_hist_rho=1_mu=095_njobs=2000_ns=1.png", dpi=600)
 
 #%% COMPARES DISTRIBUTION OF DMH SERVICE FOR 1,2 AND 4 SERVERS
 import pandas as pd
-n_sims = 100
-n_jobs = 2000
-mu = 0.95
 
-services = ["Markov", "Deterministic", "Hyper Exponential"]
+# services = ["Markov", "Deterministic", "Hyper Exponential"]
+services = ["Hyper Exponential"]
+# services = [ "Deterministic"]
 server_list = [1,2,4]
 rho = 0.9
 df = pd.DataFrame(columns=get_dataframe_columns())
@@ -74,19 +75,25 @@ df.head()
 # %%
 import seaborn as sns
 fig, ax = plt.subplots(1, 3, figsize=(10,5))
+fig.suptitle("Hyper Exponential Distribution")
 order=["H", "M", "D"]
-sns.violinplot(data=df[df["n servers"] == "1"], y="mean waiting time", x="n servers",hue="service",ax=ax[0],hue_order=order)
-sns.violinplot(data=df[df["n servers"] == "2"], y="mean waiting time", x="n servers",hue="service",ax=ax[1],hue_order=order)
-sns.violinplot(data=df[df["n servers"] == "4"], y="mean waiting time", x="n servers",hue="service",ax=ax[2],hue_order=order)
-ax[0].get_legend().remove()
+sns.set_color_codes()
+sns.violinplot(data=df[df["n servers"] == "1"], y="mean waiting time",color="b", x="n servers",ax=ax[0])
+sns.violinplot(data=df[df["n servers"] == "2"], y="mean waiting time",color="b", x="n servers",ax=ax[1])
+sns.violinplot(data=df[df["n servers"] == "4"], y="mean waiting time",color="b", x="n servers",ax=ax[2])
+
+# sns.violinplot(data=df[df["n servers"] == "1"], y="mean waiting time", x="n servers",hue="service",ax=ax[0],hue_order=order)
+# sns.violinplot(data=df[df["n servers"] == "2"], y="mean waiting time", x="n servers",hue="service",ax=ax[1],hue_order=order)
+# sns.violinplot(data=df[df["n servers"] == "4"], y="mean waiting time", x="n servers",hue="service",ax=ax[2],hue_order=order)
+# ax[0].get_legend().remove()
 ax[0].set(xlabel="")
-ax[1].get_legend().remove()
+# ax[1].get_legend().remove()
 ax[1].set(ylabel="")
 ax[2].set(ylabel="")
 ax[2].set(xlabel="")
 plt.tight_layout()
 
-plt.savefig(f"MDH_sim_rho=09,mu=095_njobs=2000_ns={n_sims}.png", dpi=600)
+plt.savefig(f"H_sim_rho=09,mu=095_njobs=2000_ns={n_sims}.png", dpi=600)
 # %%
 #%% not in reprt
 fig, ax = plt.subplots(1, 3, )
@@ -107,9 +114,6 @@ plt.savefig(f"MDH_sim_boxen_rho=09,mu=095_njobs=2000_ns={n_sims}.png", dpi=600)
 
 #%% COMPARES DISTRIBUTION OF DMH SERVICE FOR 1,2 AND 4 SERVERS FOR 0.7, 0.8, 0.9
 import pandas as pd
-n_sims = 10
-n_jobs = 2000
-mu = 0.95
 
 services = ["Markov", "Deterministic", "Hyper Exponential"]
 server_list = [1,2,4]
@@ -152,25 +156,74 @@ for i, rho in enumerate(rho_list):
     ax[i][2].set(xlabel="")
 plt.tight_layout()
 sns.despine(left=True, bottom=True)
-plt.savefig(f"MDH_sim_rho=09,mu=095_njobs=2000_ns={n_sims}.png", dpi=600)
+plt.savefig(f"MDH_sim_rho=090807_mu=095_njobs=2000_ns={n_sims}.png", dpi=600)
+# %%
+# %%
+df.describe()
+# server_list = [1,2,4]
+# rho= 0.9
+# mu = 0.95
+# n_jobs=2000
+# n_sims=10
+# service_list = ["Markov","HyperExponential"]
+
+# np.random.seed(SEED)
+# df = pd.DataFrame(columns=get_dataframe_columns())
+# for service in service_list:
+#     for n_servers in server_list:
+#         df = df.append(
+#             run_sim_as_df(rho,mu,n_servers=n_servers, n_jobs=n_jobs, n_sims=n_sims, service_dist=service[0], iteration_function=FIFO_iteration)
+#         )
+#         df = df.append(
+#             run_sim_as_df(rho,mu,n_servers=n_servers, n_jobs=n_jobs, n_sims=n_sims, service_dist=service[0], iteration_function=SJF_iteration)
+#         )
+
+
 # %%
 
 
 
 
+# #TODO: DELETE OR FIX:
 
-#%% not in reprt
-fig, ax = plt.subplots(1, 3, )
+# import seaborn as sns
+# fig, ax = plt.subplots(2, 3, figsize=(10,5))
+# # order=["H", "M"]
+# # sns.violinplot(data=df[df["n servers"] == "1"], y="mean waiting time", x="n servers",hue="treatment",ax=ax[0]) #,hue_order=order)
+# # sns.violinplot(data=df[df["n servers"] == "2"], y="mean waiting time", x="n servers",hue="treatment",ax=ax[1]) #,hue_order=order)
+# # sns.violinplot(data=df[df["n servers"] == "4"], y="mean waiting time", x="n servers",hue="treatment",ax=ax[2]) #,hue_order=order)
 
-sns.boxplot(data=df[df["n servers"] == "1"], y="mean waiting time", x="n servers",hue="service",ax=ax[0])
-sns.boxplot(data=df[df["n servers"] == "2"], y="mean waiting time", x="n servers",hue="service",ax=ax[1])
-sns.boxplot(data=df[df["n servers"] == "4"], y="mean waiting time", x="n servers",hue="service",ax=ax[2])
-ax[0].get_legend().remove()
-ax[0].set(xlabel="")
-ax[1].get_legend().remove()
-ax[1].set(ylabel="")
-ax[2].set(ylabel="")
-ax[2].set(xlabel="")
-plt.tight_layout()
-plt.savefig(f"MDH_sim_boxen_rho=09,mu=095_njobs=2000_ns={n_sims}.png", dpi=600)
-# %%
+# sns.violinplot(data=df[(df["n servers"] == "1") & (df["service"]=="M")], y="mean waiting time", x="n servers",hue="treatment",ax=ax[0][0],hue_order=order)
+# sns.violinplot(data=df[(df["n servers"] == "2") & (df["service"]=="M")], y="mean waiting time", x="n servers",hue="treatment",ax=ax[0][1],hue_order=order)
+# sns.violinplot(data=df[(df["n servers"] == "4") & (df["service"]=="M")], y="mean waiting time", x="n servers",hue="treatment",ax=ax[0][2],hue_order=order)
+
+# sns.violinplot(data=df[(df["n servers"] == "1") & (df["service"]=="H")], y="mean waiting time", x="n servers",hue="treatment",ax=ax[1][0],hue_order=order)
+# sns.violinplot(data=df[(df["n servers"] == "2") & (df["service"]=="H")], y="mean waiting time", x="n servers",hue="treatment",ax=ax[1][1],hue_order=order)
+# sns.violinplot(data=df[(df["n servers"] == "4") & (df["service"]=="H")], y="mean waiting time", x="n servers",hue="treatment",ax=ax[1][2],hue_order=order)
+# # ax[0].get_legend().remove()
+# # ax[0].set(xlabel="")
+# # ax[1].get_legend().remove()
+# # ax[1].set(ylabel="")
+# # ax[2].set(ylabel="")
+# # ax[2].set(xlabel="")
+# plt.tight_layout()
+
+# plt.savefig(f"MDH_sim_rho=09,mu=095_njobs=2000_ns={n_sims}.png", dpi=600)
+
+
+
+# #%% not in reprt
+# fig, ax = plt.subplots(1, 3, )
+
+# sns.boxplot(data=df[df["n servers"] == "1"], y="mean waiting time", x="n servers",hue="service",ax=ax[0])
+# sns.boxplot(data=df[df["n servers"] == "2"], y="mean waiting time", x="n servers",hue="service",ax=ax[1])
+# sns.boxplot(data=df[df["n servers"] == "4"], y="mean waiting time", x="n servers",hue="service",ax=ax[2])
+# ax[0].get_legend().remove()
+# ax[0].set(xlabel="")
+# ax[1].get_legend().remove()
+# ax[1].set(ylabel="")
+# ax[2].set(ylabel="")
+# ax[2].set(xlabel="")
+# plt.tight_layout()
+# plt.savefig(f"MDH_sim_boxen_rho=09,mu=095_njobs=2000_ns={n_sims}.png", dpi=600)
+# # %%

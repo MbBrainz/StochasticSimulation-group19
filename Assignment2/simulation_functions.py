@@ -75,6 +75,8 @@ def run_sim(rho, mu, n_servers, n_jobs, n_sims, service_dist="M",debug=0, iterat
     for i in range(n_sims):
         system, mean_i = iteration_function(rho, mu, n_servers, n_jobs,service_dist, debug)
         mean_wait_list.append(np.mean(system.wait_times))
+
+    calculate_stats(mean_wait_list,rho,mu,service_dist,n_servers,n_jobs,debug)
     return mean_wait_list
 
 def run_sim_as_df(rho, mu, n_servers, n_jobs, n_sims, service_dist="M",debug=0, iteration_function=FIFO_iteration) -> pd.DataFrame:
@@ -82,10 +84,18 @@ def run_sim_as_df(rho, mu, n_servers, n_jobs, n_sims, service_dist="M",debug=0, 
     df_list = [(mean_wait_list[i], service_dist, str(n_servers), str(rho), str(mu), str(iteration_function.__name__).removesuffix("_iteration"))
           for i in range(len(mean_wait_list))]
     df = pd.DataFrame(df_list, columns=get_dataframe_columns(),)
-    if debug > 0: print(df.describe())
     if debug > 1: print(df.head())
     return df
 
 def get_dataframe_columns():
     return ["mean waiting time","service", "n servers", "rho", "mu", "treatment"]
 # %%
+def calculate_stats(mean_list,rho,mu,service_dist,n_servers, n_jobs, debug=0):
+    mean_array = np.array(mean_list)
+    n_sims = len(mean_array)
+    mean_value = np.mean(mean_array)
+    std_value =  np.std(mean_array, ddof=1)
+    c_level = 0.95
+    ci = confidence_interval(mean_value, std_value, n_sims, level=c_level)
+    if debug>0: print(f'For service {service_dist} with values rho({rho:.2f}), mu({mu:.2f}), n_servers({n_servers:.0f}), njobs({n_jobs:.0f}), nsims({n_sims:.0f}) found a confidence interval of \n\
+          {c_level*100:.0f}%: [{ci[0]:.3f}, {ci[1]:.3f}]')

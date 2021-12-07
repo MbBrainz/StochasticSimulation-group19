@@ -1,7 +1,7 @@
 #%%  run simulations for different loads
 # compare load statistics
 import numpy as np
-from simulation_functions import run_simulation, SJF_iteration, FIFO_iteration
+from simulation_functions import *
 import matplotlib.pyplot as plt
 from util import SEED
 
@@ -11,14 +11,14 @@ from util import SEED
 
 
 
-# TODO: np.random.seed(SEED)
 
 
 #%%
+np.random.seed(SEED)
 n_sims = 200
 n_jobs = 20000
 mu = 0.95
-rho_list = np.arange(0.8, 1.0, 0.02)
+rho_list = np.arange(0.8, 1.0, 0.01)
 FIFOdatalist = []
 
 for load in rho_list:
@@ -56,12 +56,14 @@ fig, ax = plt.subplots(1, 1, )
 plot_errorHue(rho_list, FIFOdatalist, "FIFO", ax)
 plot_errorHue(rho_list, SJFdatalist, "SJF", ax)
 ax.set(
-    xlabel=r'load $\rho)',
+    xlabel=r'load ($\rho$)',
     ylabel='average waiting time',
     title='load characeristics of service systems',
-    xticks=rho_list
+    xticks=rho_list[np.arange(0,20,2)]
 )
-# plt.savefig("figures/load_chr_FIFO_SJF_errorHue_drho=0.02_mu=095_njobs=20000-1.png")
+ax.legend(loc="upper left", frameon=True, shadow=True)
+
+# plt.savefig("load_chr_FIFO_SJF_errorHue_drho=0.01_mu=095_njobs=20000-2.png")
 #%%
 
 
@@ -71,7 +73,7 @@ fig, ax = plt.subplots(1, 1, )
 plot_errorbar(rho_list, FIFOdatalist, "FIFO", ax)
 plot_errorbar(rho_list, SJFdatalist, "SJF", ax)
 ax.set(
-    xlabel=r'$load (\rho)$',
+    xlabel=r'load $(\rho)$',
     ylabel='average waiting time',
     title='load characeristics of service systems',
     xticks=rho_list
@@ -79,7 +81,7 @@ ax.set(
 # plt.savefig("figures/load_chr_FIFO_SJF_errorbar_drho=0.02_mu=095_njobs=20000-1.png")
 
 #%% Plot distributions of watining times  for 4 values of rho
-n_sims = 100
+n_sims = 500
 n_jobs = 20000
 mu = 0.95
 rho_list = [0.8, 0.85, 0.90]
@@ -88,7 +90,6 @@ FIFOdatalist = []
 for load in rho_list:
     FIFOdatalist.append(run_simulation(load,mu, n_servers=1, n_jobs=n_jobs,n_sims=n_sims,debug=1, iteration_function=FIFO_iteration, return_data=True))
 
-#%%
 SJFdatalist = []
 for load in rho_list:
     SJFdatalist.append(run_simulation(load, mu, n_servers=1, n_jobs=n_jobs, n_sims=n_sims, debug=1, iteration_function=SJF_iteration,return_data=True))
@@ -117,20 +118,33 @@ for i in range(len(rho_list)):
             str(rho_list[i])))
 
 df = pd.DataFrame(meandata_list, columns=["time", "service", "rho"],)
-df.to_csv("data/load_chr_FIFO_SJF_dataframe.csv")
+df.to_csv("data/load_chr_FIFO_SJF_dataframe_nsims=200-big.csv")
 
 df.head()
 #%%
 sns.displot(df,bins=200,x="time", hue="service",col="rho",kde=True, legend=True)
-plt.ylim(top=200)
-plt.xlim(right=40)
-plt.savefig("figures/load_chr_FIFO_SJF_kde_4rhos_mu=0.95_njobs=20000_nsim=200.png", dpi=600)
+# plt.ylim(top=200)
+# plt.xlim(right=40)
+plt.savefig("figures/load_chr_FIFO_SJF_kde_3rhos_mu=0.95_njobs=20000_nsim=200-2.png", dpi=600)
 
 #%%
 # isRho09or08 = df['rho']== ( 0.9 | 0.8 )
 # df_filtered=df[df['rho'].isin([0.8, 0.85, 0.9])]
-sns.violinplot(data= df,x="rho",y="time",hue="service",legend=True)
-plt.savefig("figures/load_chr_FIFO_SJF_violin_4rhos_mu=0.95_njobs=20000_nsim=200-1.png", dpi=600)
+# fig, ax = plt.subplots(1, 1, figsize=(10,8))
+# sns.violinplot(data= df,x="rho",y="time",hue="service",legend=True,ax=ax)
+fig, ax = plt.subplots(1, 3, figsize=(10,5))
+# order=["H", "M", "D"]
+sns.violinplot(data=df[df["rho"] == "0.8"],  y="time", x="rho",hue="service",ax=ax[0] )
+sns.violinplot(data=df[df["rho"] == "0.85"], y="time", x="rho",hue="service",ax=ax[1])
+sns.violinplot(data=df[df["rho"] == "0.9"],  y="time", x="rho",hue="service",ax=ax[2] )
+ax[0].get_legend().remove()
+ax[0].set(xlabel="")
+ax[1].get_legend().remove()
+ax[1].set(ylabel="")
+ax[2].set(ylabel="")
+ax[2].set(xlabel="")
+plt.tight_layout()
+plt.savefig("figures/load_chr_FIFO_SJF_violin_3rhos_mu=0.95_njobs=20000_nsim=200-2.png", dpi=600)
 
 
 #%% Saving general stats to json
@@ -165,4 +179,4 @@ stats_dict = {
 print(stats_dict)
 #%%
 # from util import save_data
-save_data(stats_dict, "load_chr_FIFO_SJF_general_stats-1")
+save_data(stats_dict, "load_chr_FIFO_SJF_general_stats-2")
