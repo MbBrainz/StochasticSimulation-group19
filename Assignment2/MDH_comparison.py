@@ -56,8 +56,8 @@ plt.savefig("MDH_iter_hist_rho=1_mu=095_njobs=2000_ns=1.png", dpi=600)
 import pandas as pd
 
 # services = ["Markov", "Deterministic", "Hyper Exponential"]
-services = ["Hyper Exponential"]
-# services = [ "Deterministic"]
+# services = ["Hyper Exponential"]
+services = [ "Deterministic"]
 server_list = [1,2,4]
 rho = 0.9
 df = pd.DataFrame(columns=get_dataframe_columns())

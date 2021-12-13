@@ -55,26 +55,7 @@ plt.savefig("MDH_iter_hist_rho=1_mu=095_njobs=2000_ns=1.png", dpi=600)
 rho=20
 system, data = FIFO_iteration(rho=rho, mu=mu, n_servers=1, n_jobs=n_jobs,service_dist="H", debug=3)
 plt.hist(system.wait_times, bins=50)
-#%%
-rho=0.90
-mu=15
-n_servers=1
-fig, ax = plt.subplots(1, 1, )
-plot_simulation(ax, rho=rho, mu=mu, n_servers=n_servers, n_jobs=2000, n_sims=200, service_dist="M", debug=1)
-plot_simulation(ax, rho=rho, mu=mu, n_servers=n_servers, n_jobs=2000, n_sims=200, service_dist="D", debug=1)
-plot_simulation(ax, rho=rho, mu=mu, n_servers=n_servers, n_jobs=2000, n_sims=200, service_dist="H", debug=1)
-plt.title("single server")
-plt.legend()
-#%%
-rho=0.90
-mu=15
-n_servers=2
-fig, ax = plt.subplots(1, 1, )
-plot_simulation(ax, rho=rho, mu=mu, n_servers=n_servers, n_jobs=2000, n_sims=100, service_dist="M", debug=1)
-plot_simulation(ax, rho=rho, mu=mu, n_servers=n_servers, n_jobs=2000, n_sims=100, service_dist="D", debug=1)
-plot_simulation(ax, rho=rho, mu=mu, n_servers=n_servers, n_jobs=2000, n_sims=100, service_dist="H", debug=1)
-plt.title("multi server")
-plt.legend()
+
 # %%
 run_simulation(rho=10,mu=1, n_servers=1, n_jobs=100, n_sims=100, debug=0)
 # %%
@@ -92,5 +73,5 @@ plot_errorbar(x_array=n_jobs_list,datalist=results, label="jobs", ax=ax)
 # and then once you reachs
 # %%
 
-
+df = pd.DataFrame()
 # %%
