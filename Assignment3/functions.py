@@ -1,9 +1,15 @@
 # %%
+from typing import ForwardRef
 import numpy as np
 import math
 from random import seed
 from random import random
 from numba import jit
+from csv import writer
+
+
+from time import time
+from os.path import exists
 
 # %%
 def initialParameter():
@@ -117,16 +123,15 @@ def two_opt_swap(route, i, k):
 def comp_shortest_path(T_start, T_end, cooling_factor, nMarkov, coords):
     """Function that computes the shortest path for the Traveling Salesman Problem using Simulated Annealing.
 
+        Args:
+            T_start (float): Starting temperature
+            T_end (float): Temperature that determines when the Anealing process stops
+            cooling_factor (float): determines the speed of the cooling process.
+            nMarkov (int): Length of the markov chain
+            coords (numpy.ndarray): coordinate array with tuples of city coordinates in the form: ()
 
-    Args:
-        T_start (float): Starting temperature
-        T_end (float): Temperature that determines when the Anealing process stops
-        cooling_factor (float): determines the speed of the cooling process.
-        nMarkov (int): Length of the markov chain
-        coords (numpy.ndarray): coordinate array with tuples of city coordinates in the form: ()
-
-    Returns:
-        tuple: [0] final number of iterations, [1]minimal cost, [2]optimal cities list
+        Returns:
+            tuple: [0] final number of iterations, [1]minimal cost, [2]optimal cities list
     """
     T = T_start
     itr = 0
@@ -164,7 +169,6 @@ def comp_shortest_path(T_start, T_end, cooling_factor, nMarkov, coords):
             #min_cost_arr.append(new_cost)
                 min_cost = new_cost
 
-
             prob = np.minimum(math.exp(-cost_difference/T),1)
             random_num = np.random.uniform()
             #print(prob)
@@ -182,5 +186,51 @@ def comp_shortest_path(T_start, T_end, cooling_factor, nMarkov, coords):
         T = T * cooling_factor
     return itr, min_cost, optimal_list_cities
 # %%
+
+class TestResult:
+    def __init__(self,
+                 min_cost:float,
+                 optimal_path: list[int],
+                 comp_time: float,
+                 dataset: str,
+                 tstart: float,
+                 tend:float,
+                 n_markov: float,):
+
+        self.min_cost = min_cost
+        self.optimal_path=optimal_path
+        self.comp_time = comp_time
+        self.dataset = dataset
+        self.tstart = tstart
+        self.tend = tend
+        self.n_markov = n_markov
+        self.version = 1 # Version of the result.
+
+    @staticmethod
+    def headers():
+        return ["Minimal Cost", "Optimal Path","Computation Time", "Dataset", "Start Temperature", "End Temperature", "Markov Chain Length"]
+
+    def result_data(self):
+        data_list = [self.min_cost, self.optimal_path,self.comp_time, self.dataset, self.tstart, self.tend, self.n_markov]
+        return [str(data) for data in data_list]
+
+    def explain(self):
+        """Prints the results to console in a readable format
+        """
+        print(f"Result of simulation for {self.dataset}: \n \
+                mincost: \t| \t {self.min_cost} \n")
+
+    def save_to_csv(self, filename=f"TSP_SA_results"):
+        path = f'data/{filename}_v{self.version}.csv'
+
+        mode = 'a' if exists(path) else 'w'
+        with open(path, mode, newline="") as file:
+            writer_obj = writer(file)
+            if mode=='w':
+                writer_obj.writerow(TestResult.headers())
+            writer_obj.writerow(self.result_data())
+
+            file.close()
+
 
 # %%
