@@ -120,7 +120,7 @@ def two_opt_swap(route, i, k):
 
 # %%
 
-def comp_shortest_path(T_start, T_end, cooling_factor, nMarkov, coords):
+def comp_shortest_path(T_start, T_end, cooling_factor, nMarkov, coords, dataset, save_data=False):
     """Function that computes the shortest path for the Traveling Salesman Problem using Simulated Annealing.
 
         Args:
@@ -150,8 +150,9 @@ def comp_shortest_path(T_start, T_end, cooling_factor, nMarkov, coords):
     best_for_Temp = []
     new_cost_arr = []
     new_cost = old_cost
-    optimal_list_cities = None
+    optimal_list_cities = route
 
+    start_time = time()
     while T >= T_end:
         for k in range(nMarkov):    # Markov
             i,j = generate_i_j(num_cities)
@@ -184,13 +185,20 @@ def comp_shortest_path(T_start, T_end, cooling_factor, nMarkov, coords):
 
         itr = itr + 1
         T = T * cooling_factor
+    comp_time = time() - start_time
+
+    if save_data:
+        result = TestResult(min_cost, optimal_list_cities, itr, comp_time, dataset, T_start, T_end, n_markov=nMarkov)
+        result.save_to_csv()
+
     return itr, min_cost, optimal_list_cities
 # %%
 
 class TestResult:
     def __init__(self,
                  min_cost:float,
-                 optimal_path: list[int],
+                 optimal_path: np.ndarray,
+                 n_itr: int,
                  comp_time: float,
                  dataset: str,
                  tstart: float,
@@ -199,6 +207,7 @@ class TestResult:
 
         self.min_cost = min_cost
         self.optimal_path=optimal_path
+        self.n_itr = n_itr
         self.comp_time = comp_time
         self.dataset = dataset
         self.tstart = tstart
@@ -208,10 +217,10 @@ class TestResult:
 
     @staticmethod
     def headers():
-        return ["Minimal Cost", "Optimal Path","Computation Time", "Dataset", "Start Temperature", "End Temperature", "Markov Chain Length"]
+        return ["Minimal Cost", "Optimal Path","iterations","Computation Time", "Dataset", "Start Temperature", "End Temperature", "Markov Chain Length"]
 
     def result_data(self):
-        data_list = [self.min_cost, self.optimal_path,self.comp_time, self.dataset, self.tstart, self.tend, self.n_markov]
+        data_list = [self.min_cost, self.optimal_path,self.n_itr, self.comp_time, self.dataset, self.tstart, self.tend, self.n_markov]
         return [str(data) for data in data_list]
 
     def explain(self):
