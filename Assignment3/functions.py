@@ -136,13 +136,16 @@ def comp_shortest_path(T_start, T_end, cooling_factor, nMarkov, coords, dataset,
     T = T_start
     itr = 0
     matrix = distance_matrix(coords)
-
-    route = np.arange(0,len(coords))
+    
+    route = np.arange(1,len(coords))
     np.random.shuffle(route)
+    
+     # starts and end at the first node in route/
+    route = np.append(route,0)
+    route = np.append(0,route)
+    
     num_cities = len(route)
-    # starts and end at the first node in route
-    np.append(route,route[0])
-
+ 
     old_cost = total_dist(route,matrix)
     min_cost = old_cost
 
