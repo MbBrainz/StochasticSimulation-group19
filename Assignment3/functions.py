@@ -213,24 +213,24 @@ class TestResult:
         self.tstart = tstart
         self.tend = tend
         self.n_markov = n_markov
-        self.version = 1 # Version of the result.
 
     @staticmethod
     def headers():
         return ["Minimal Cost", "Optimal Path","iterations","Computation Time", "Dataset", "Start Temperature", "End Temperature", "Markov Chain Length"]
 
+    @staticmethod
+    def version(): return 1
+
+    @staticmethod
+    def get_filepath(filename="TSP_SA_results"):
+        return f'data/{filename}_v{TestResult.version()}.csv'
+
     def result_data(self):
         data_list = [self.min_cost, self.optimal_path,self.n_itr, self.comp_time, self.dataset, self.tstart, self.tend, self.n_markov]
         return [str(data) for data in data_list]
 
-    def explain(self):
-        """Prints the results to console in a readable format
-        """
-        print(f"Result of simulation for {self.dataset}: \n \
-                mincost: \t| \t {self.min_cost} \n")
-
     def save_to_csv(self, filename=f"TSP_SA_results"):
-        path = f'data/{filename}_v{self.version}.csv'
+        path = TestResult.get_filepath(filename=filename)
 
         mode = 'a' if exists(path) else 'w'
         with open(path, mode, newline="") as file:
@@ -241,5 +241,14 @@ class TestResult:
 
             file.close()
 
+    def explain(self):
+        """Prints the results to console in a readable format
+        """
+        print(f"Result of simulation for {self.dataset}: \n \
+                mincost: \t| \t {self.min_cost} \n")
 
 # %%
+from pandas import read_csv
+def read_data():
+    df = read_csv(TestResult.get_filepath())
+    return df
