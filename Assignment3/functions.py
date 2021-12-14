@@ -57,9 +57,12 @@ def read_tsp_file_opt(tsp_file):
         line = line.split()
 
 
-        opt_tour.append(line)
+        opt_tour.append(int(line[0]))
     datafile.close()
     return opt_tour
+
+def get_optimal_length(tsp_file):
+    optimal_tour = read_tsp_file_opt(tsp_file)
 
 
 # Euc distance
