@@ -191,12 +191,13 @@ def comp_shortest_path(T_start, T_end, cooling_factor, nMarkov, coords, dataset,
         itr = itr + 1
         T = T * cooling_factor
     comp_time = time() - start_time
+    best_cost_till_now_ar = np.asarray(best_cost_till_now)
 
     if save_data:
-        result = TestResult(min_cost, optimal_list_cities, itr, comp_time, dataset, T_start, T_end, n_markov=nMarkov)
+        result = TestResult(min_cost, optimal_list_cities, itr, comp_time, dataset, T_start, T_end,best_cost_till_now_ar, n_markov=nMarkov)
         result.save_to_csv()
 
-    return itr, min_cost, optimal_list_cities,best_cost_till_now
+    return itr, min_cost, optimal_list_cities, best_cost_till_now_ar
 # %%
 
 class TestResult:
@@ -208,6 +209,7 @@ class TestResult:
                  dataset: str,
                  tstart: float,
                  tend:float,
+                 local_minima:np.ndarray,
                  n_markov: float,):
 
         self.min_cost = min_cost
@@ -217,11 +219,12 @@ class TestResult:
         self.dataset = dataset
         self.tstart = tstart
         self.tend = tend
+        self.local_minima = local_minima
         self.n_markov = n_markov
 
     @staticmethod
     def headers():
-        return ["Minimal Cost", "Optimal Path","iterations","Computation Time", "Dataset", "Start Temperature", "End Temperature", "Markov Chain Length"]
+        return ["Minimal Cost", "Optimal Path","iterations","Computation Time", "Dataset", "Start Temperature", "End Temperature", "Local Minima","Markov Chain Length"]
 
     @staticmethod
     def version(): return 1
@@ -231,7 +234,7 @@ class TestResult:
         return f'data/{filename}_v{TestResult.version()}.csv'
 
     def result_data(self):
-        data_list = [self.min_cost, self.optimal_path,self.n_itr, self.comp_time, self.dataset, self.tstart, self.tend, self.n_markov]
+        data_list = [self.min_cost, self.optimal_path,self.n_itr, self.comp_time, self.dataset, self.tstart, self.tend,self.local_minima, self.n_markov]
         return [str(data) for data in data_list]
 
     def save_to_csv(self, filename=f"TSP_SA_results"):
