@@ -147,8 +147,8 @@ def comp_shortest_path(T_start, T_end, cooling_factor, nMarkov, coords, dataset,
     min_cost = old_cost
 
     best_cost_till_now = []
-    best_for_Temp = []
     new_cost_arr = []
+    
     new_cost = old_cost
     optimal_list_cities = route
 
@@ -169,8 +169,13 @@ def comp_shortest_path(T_start, T_end, cooling_factor, nMarkov, coords, dataset,
             #print(min_cost)
             #min_cost_arr.append(new_cost)
                 min_cost = new_cost
-
-            prob = np.minimum(math.exp(-cost_difference/T),1)
+                best_cost_till_now.append(min_cost)
+            
+            if(cost_difference < 0):
+                prob = 1
+            else:
+                prob = np.minimum(math.exp(-cost_difference/T),1)
+                
             random_num = np.random.uniform()
             #print(prob)
 
@@ -181,7 +186,7 @@ def comp_shortest_path(T_start, T_end, cooling_factor, nMarkov, coords, dataset,
                 optimal_list_cities = route
 
         best_cost_till_now.append(min_cost)
-        best_for_Temp.append(old_cost)
+        
 
         itr = itr + 1
         T = T * cooling_factor
@@ -191,7 +196,7 @@ def comp_shortest_path(T_start, T_end, cooling_factor, nMarkov, coords, dataset,
         result = TestResult(min_cost, optimal_list_cities, itr, comp_time, dataset, T_start, T_end, n_markov=nMarkov)
         result.save_to_csv()
 
-    return itr, min_cost, optimal_list_cities
+    return itr, min_cost, optimal_list_cities,best_cost_till_now
 # %%
 
 class TestResult:
