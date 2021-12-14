@@ -42,6 +42,25 @@ def read_tsp_file(tsp_file):
     datafile.close()
     return coords
 
+def read_tsp_file_opt(tsp_file):
+    opt_tour = []
+    datafile = open(tsp_file,"r")
+    while(1):
+        line = datafile.readline()
+        if "TOUR_SECTION" in line:
+            break
+
+    while(1):
+        line = datafile.readline()
+        if "EOF" in line:
+            break
+        line = line.split()
+
+
+        opt_tour.append(line)
+    datafile.close()
+    return opt_tour
+
 
 # Euc distance
 def distance(n1, n2):
@@ -151,7 +170,7 @@ def comp_shortest_path(T_start, T_end, cooling_factor, nMarkov, coords, dataset,
 
     best_cost_till_now = []
     new_cost_arr = []
-    
+
     new_cost = old_cost
     optimal_list_cities = route
 
@@ -173,12 +192,12 @@ def comp_shortest_path(T_start, T_end, cooling_factor, nMarkov, coords, dataset,
             #min_cost_arr.append(new_cost)
                 min_cost = new_cost
                 best_cost_till_now.append(min_cost)
-            
+
             if(cost_difference < 0):
                 prob = 1
             else:
                 prob = np.minimum(math.exp(-cost_difference/T),1)
-                
+
             random_num = np.random.uniform()
             #print(prob)
 
@@ -189,7 +208,7 @@ def comp_shortest_path(T_start, T_end, cooling_factor, nMarkov, coords, dataset,
                 optimal_list_cities = route
 
         best_cost_till_now.append(min_cost)
-        
+
 
         itr = itr + 1
         T = T * cooling_factor
