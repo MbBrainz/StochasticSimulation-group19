@@ -158,16 +158,16 @@ def comp_shortest_path(T_start, T_end, cooling_factor, nMarkov, coords, dataset,
     T = T_start
     itr = 0
     matrix = distance_matrix(coords)
-    
+
     route = np.arange(1,len(coords))
     np.random.shuffle(route)
-    
+
      # starts and end at the first node in route/
     route = np.append(route,0)
     route = np.append(0,route)
-    
+
     num_cities = len(route)
- 
+
     old_cost = total_dist(route,matrix)
     min_cost = old_cost
 
@@ -254,7 +254,7 @@ class TestResult:
         return ["Minimal Cost", "Optimal Path","iterations","Computation Time", "Dataset", "Start Temperature", "End Temperature", "Local Minima","Cooling Factor","Markov Chain Length"]
 
     @staticmethod
-    def version(): return 1
+    def version(): return 2
 
     @staticmethod
     def get_filepath(filename="TSP_SA_results"):
