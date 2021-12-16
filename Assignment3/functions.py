@@ -6,10 +6,14 @@ from random import seed
 from random import random
 from numba import jit
 from csv import writer
+from getpass import getuser
+import pandas as pd
 
 
 from time import time
 from os.path import exists
+
+from pandas.core.accessor import register_dataframe_accessor
 
 # %%
 def initialParameter():
@@ -18,7 +22,7 @@ def initialParameter():
     t_start = 100.0
     t_final  = 1
     nMarkov = 1000
-    cooling_factor    = 0.98
+    cooling_factor    = 0.99
 
     return t_start,t_final,cooling_factor,nMarkov
 
@@ -254,27 +258,21 @@ class TestResult:
         return ["Minimal Cost", "Optimal Path","iterations","Computation Time", "Dataset", "Start Temperature", "End Temperature", "Local Minima","Cooling Factor","Markov Chain Length"]
 
     @staticmethod
-    def version(): return 2
+    def version(): return "2"
 
     @staticmethod
     def get_filepath(filename="TSP_SA_results"):
-        return f'data/{filename}_v{TestResult.version()}.csv'
+        return f'data/{filename}_v{TestResult.version()}_{getuser()}.csv'
 
     def result_data(self):
-        data_list = [self.min_cost, self.optimal_path,self.n_itr, self.comp_time, self.dataset, self.tstart, self.tend,self.local_minima, self.cooling_factor,self.n_markov]
-        return [str(data) for data in data_list]
+        return [self.min_cost ,[int(x) for x in self.optimal_path] , self.n_itr, self.comp_time, self.dataset, self.tstart, self.tend, [float(x) for x in self.local_minima], self.cooling_factor,self.n_markov]
 
     def save_to_csv(self, filename=f"TSP_SA_results"):
         path = TestResult.get_filepath(filename=filename)
-
         mode = 'a' if exists(path) else 'w'
-        with open(path, mode, newline="") as file:
-            writer_obj = writer(file)
-            if mode=='w':
-                writer_obj.writerow(TestResult.headers())
-            writer_obj.writerow(self.result_data())
 
-            file.close()
+        df = pd.DataFrame([self.result_data()], columns=TestResult.headers())
+        df.to_csv(path, mode=mode, header=(mode=="w"), index=False)
 
     def explain(self):
         """Prints the results to console in a readable format
@@ -286,4 +284,15 @@ class TestResult:
 from pandas import read_csv
 def read_data():
     df = read_csv(TestResult.get_filepath())
+
+    # opt_path_list = df[TestResult.headers()[1]].map(stringlist_to_string)
+    # opt_path_list
+    # df = df.drop(columns=TestResult.headers()[1])
+    # df.insert(1,TestResult.headers()[1], opt_path_list.tolist())
     return df
+
+
+def stringlist_to_string(stringlist:str):
+    list_of_strings = stringlist.removeprefix("[").removeprefix(" ").removesuffix("]").split()
+    return [int(x) for x in list_of_strings]
+# %%
